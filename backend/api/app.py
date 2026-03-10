@@ -8,9 +8,37 @@ app = FastAPI(
     version="1.0"
 )
 
-# -----------------------------
-# Models
-# -----------------------------
+# -------------------------
+# ROOT ENDPOINT
+# -------------------------
+
+@app.get("/")
+def root():
+    return {"status": "Mining Intelligence API running"}
+
+# -------------------------
+# HEALTHCHECK (Railway)
+# -------------------------
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+# -------------------------
+# SYSTEM STATUS
+# -------------------------
+
+@app.get("/system")
+def system_status():
+    return {
+        "api": "running",
+        "ml_engine": "ready",
+        "database": "not_connected"
+    }
+
+# -------------------------
+# DATA MODELS
+# -------------------------
 
 class Telemetry(BaseModel):
     equipment_id: str
@@ -24,57 +52,18 @@ class PredictionInput(BaseModel):
     speed: float
     temperature: float
 
-
-# -----------------------------
-# Root Endpoint
-# -----------------------------
-
-@app.get("/")
-def root():
-    return {
-        "platform": "InterMineForce360",
-        "status": "running",
-        "service": "Mining Intelligence API"
-    }
-
-
-# -----------------------------
-# Health Check (Railway uses this)
-# -----------------------------
-
-@app.get("/health")
-def health():
-    return {
-        "status": "ok",
-        "service": "api"
-    }
-
-
-# -----------------------------
-# System Status
-# -----------------------------
-
-@app.get("/system")
-def system_status():
-    return {
-        "api": "running",
-        "ml_engine": "ready",
-        "database": "simulated"
-    }
-
-
-# -----------------------------
-# Telemetry Ingestion
-# -----------------------------
+# -------------------------
+# TELEMETRY INGESTION
+# -------------------------
 
 @app.post("/telemetry")
 def receive_telemetry(data: Telemetry):
-    
+
     anomaly = False
-    
+
     if data.temperature > 95:
         anomaly = True
-        
+
     if data.vibration > 8:
         anomaly = True
 
@@ -84,16 +73,19 @@ def receive_telemetry(data: Telemetry):
         "message": "Telemetry processed"
     }
 
-
-# -----------------------------
-# ML Prediction (demo)
-# -----------------------------
+# -------------------------
+# ML PREDICTION
+# -------------------------
 
 @app.post("/predict")
 def predict(data: PredictionInput):
 
-    values = np.array([data.load, data.speed, data.temperature])
-    
+    values = np.array([
+        data.load,
+        data.speed,
+        data.temperature
+    ])
+
     score = values.mean()
 
     risk = "low"
@@ -109,19 +101,18 @@ def predict(data: PredictionInput):
         "score": float(score)
     }
 
-
-# -----------------------------
-# API Info
-# -----------------------------
+# -------------------------
+# PLATFORM INFO
+# -------------------------
 
 @app.get("/info")
-def api_info():
+def info():
     return {
         "platform": "InterMineForce360",
         "version": "1.0",
         "modules": [
             "telemetry",
-            "ml_prediction",
+            "prediction",
             "system_monitoring"
         ]
     }
