@@ -1,21 +1,11 @@
+FROM python:3.11-slim
 
-from fastapi import FastAPI
-import os
+WORKDIR /app
 
-app = FastAPI(title="Mining Intelligence Platform")
+COPY requirements.txt .
 
-@app.get("/")
-def root():
-    return {"platform": "Mining Intelligence Platform", "status": "online"}
+RUN pip install --no-cache-dir -r requirements.txt
 
-@app.get("/fleet")
-def fleet():
-    return [
-        {"equipment": "Truck-101", "status": "operational", "location": "Pit A"},
-        {"equipment": "Drill-22", "status": "maintenance", "location": "Pit B"},
-        {"equipment": "Excavator-9", "status": "operational", "location": "Pit C"},
-    ]
+COPY . .
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+CMD ["python", "app.py"]
