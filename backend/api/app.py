@@ -1,11 +1,7 @@
-FROM python:3.11-slim
+from fastapi import FastAPI
 
-WORKDIR /app
+app = FastAPI()
 
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-CMD ["uvicorn","app:app","--host","0.0.0.0","--port","8080"]
+@app.get("/")
+def root():
+    return {"status": "Mining Intelligence API running"}
