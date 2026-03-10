@@ -1,18 +1,11 @@
+FROM python:3.11-slim
 
-from fastapi import FastAPI
-import random
+WORKDIR /app
 
-app = FastAPI(title="Predictive Maintenance AI")
+COPY requirements.txt .
 
-@app.get("/predict/{machine}")
-def predict(machine: str):
-    risk = random.uniform(0,1)
-    return {
-        "machine": machine,
-        "failure_risk": round(risk,2),
-        "recommendation": "schedule maintenance" if risk > 0.6 else "normal operation"
-    }
+RUN pip install --no-cache-dir -r requirements.txt
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+COPY . .
+
+CMD ["python", "ml_service.py"]
