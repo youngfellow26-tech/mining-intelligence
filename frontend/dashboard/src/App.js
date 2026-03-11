@@ -1,50 +1,77 @@
-import React, { useEffect, useState } from "react";
 
-function App() {
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 
-  const [fleet, setFleet] = useState([
-    {equipment:"Truck-101",status:"Operational",location:"Pit A"},
-    {equipment:"Drill-22",status:"Maintenance",location:"Pit B"},
-    {equipment:"Excavator-9",status:"Operational",location:"Pit C"}
-  ]);
+app = FastAPI()
 
-  useEffect(() => {
-    fetch("http://localhost:8000/fleet")
-      .then(res => res.json())
-      .then(data => setFleet(data))
-      .catch(() => {
-        console.log("API not connected — using demo data");
-      });
-  }, []);
+@app.get("/", response_class=HTMLResponse)
+def dashboard():
+    return '''
+    <html>
+    <head>
+        <title>InterMineForce360</title>
+        <style>
+            body {
+                font-family: Arial;
+                background:#0f172a;
+                color:white;
+                padding:40px;
+            }
+            h1 {color:#38bdf8;}
+            table {
+                width:100%;
+                border-collapse:collapse;
+                margin-top:20px;
+            }
+            th,td {
+                border:1px solid #334155;
+                padding:10px;
+                text-align:left;
+            }
+            th {background:#1e293b;}
+        </style>
+    </head>
+    <body>
+        <h1>InterMineForce360</h1>
+        <h2>Mining Intelligence Dashboard</h2>
 
-  return (
-    <div style={{background:"#0b1220",color:"white",minHeight:"100vh",padding:"40px",fontFamily:"Arial"}}>
-      
-      <h1>Mining Intelligence Platform</h1>
-      <h3>Fleet Operations Dashboard</h3>
-
-      <table style={{width:"100%",marginTop:"20px",borderCollapse:"collapse"}}>
-        <thead>
-          <tr style={{background:"#1c2541"}}>
-            <th>Equipment</th>
-            <th>Status</th>
-            <th>Location</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {fleet.map((f,i)=>(
-            <tr key={i}>
-              <td>{f.equipment}</td>
-              <td>{f.status}</td>
-              <td>{f.location}</td>
+        <table>
+            <tr>
+                <th>Equipment</th>
+                <th>Status</th>
+                <th>Location</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+            <tr>
+                <td>Truck-101</td>
+                <td>Operational</td>
+                <td>Pit A</td>
+            </tr>
+            <tr>
+                <td>Drill-22</td>
+                <td>Maintenance</td>
+                <td>Pit B</td>
+            </tr>
+            <tr>
+                <td>Excavator-9</td>
+                <td>Operational</td>
+                <td>Pit C</td>
+            </tr>
+        </table>
 
-    </div>
-  );
-}
+        <h3>Predictive Maintenance</h3>
+        <p>AI Risk Score: 32%</p>
 
-export default App;
+        <h3>Operational Resilience</h3>
+        <p>Supply Chain Stability Index: 87%</p>
+
+    </body>
+    </html>
+    '''
+
+@app.get("/fleet")
+def fleet():
+    return [
+        {"equipment":"Truck-101","status":"Operational","location":"Pit A"},
+        {"equipment":"Drill-22","status":"Maintenance","location":"Pit B"},
+        {"equipment":"Excavator-9","status":"Operational","location":"Pit C"}
+    ]
